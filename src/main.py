@@ -24,9 +24,10 @@ _nationalAntem = 1
 _tetrisSound = 0
 
 currentSong = None
-_music = ['Musik/tetris-gameboy-02.wav', "Musik/irgentwie.mp3", "Musik/Tiger.mp3" ,'Musik/NationAntem.wav']
+_music = ['Musik/tetris-gameboy-02.wav', "Musik/irgentwie.mp3", "Musik/Tiger.mp3", 'Musik/NationAntem.wav']
 
-_pictures = ["pictures/normal.jpg", "pictures/normal2.jpg", "pictures/normal3.jpg","bett.jpg" ,"pictures/Download.png","pictures/blayd.png"]
+_pictures = ["pictures/normal.jpg", "pictures/normal2.jpg", "pictures/normal3.jpg", "bett.jpg", "pictures/Download.png",
+             "pictures/blayd.png"]
 _currentpic = 1
 
 blaydmodus = False
@@ -52,7 +53,7 @@ top_left_y = s_height - play_height
 
 normalcolor = (255, 0, 255)
 blaydcolor = [(255, 215, 0), (205, 0, 0)]
-tigercolor = [(255,255,255),(203,113,25)]
+tigercolor = [(255, 255, 255), (203, 113, 25)]
 
 shapes = shapedrawer.returnShapes()
 stern = shapedrawer.get_star()
@@ -61,8 +62,7 @@ shape_points = [2, 2, 1, 1, 2, 2, 3]
 
 starColor = [(255, 255, 255), (255, 255, 0)]
 
-sounds = ["Sounds/groundpoop.wav", "Sounds/bubsi.mp3" , "Sounds/Hihi.mp3","Sounds/destoryBub.wav"]
-
+sounds = ["Sounds/groundpoop.wav", "Sounds/bubsi.mp3", "Sounds/Hihi.mp3", "Sounds/destoryBub.wav"]
 
 
 # index 0 - 6 represent shape
@@ -175,9 +175,33 @@ def draw_grid_lines(surface, grid):
                              (sx + j * block_size, sy + play_height))  # vertical lines
 
 
-def clear_rows(grid, locked):
-    pass
 
+
+
+def clear_rows(grid, locked):
+    clearedRows = 0
+
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == (0, 0, 0):
+                break
+            if j == len(grid[i]) - 1:
+                clearedRows += 1
+                row_nr = i
+                for k in range(len(grid[i])):
+                    try:
+                        del locked[(j,i)]
+                    except:
+                        continue
+
+    if clearedRows > 0:
+        for key in sorted(list(locked), key=lambda x: x[1])[::-1]: # so [::-1] -> revers  1324 -> 4231
+            x, y = key
+            if y < row_nr:
+                new_key = (x, y + clearedRows)
+                locked[new_key] = locked.pop(key)
+
+    return clearedRows
 
 def draw_next_shape(shape, surface):
     font = pygame.font.SysFont('comicsans', 20)
@@ -186,28 +210,36 @@ def draw_next_shape(shape, surface):
     sx = top_left_x + play_width
     sy = top_left_y
 
-def findAndDestroy(loggedPostion,pos):
+
+def findAndDestroy(loggedPostion, pos):
     pass
+
+
 # bladmodus
-def draw_window(surface, grid):
+def draw_window(surface, grid, score, comments = ""):
     pygame.font.init()
-    font = pygame.font.SysFont('comicsans', 60)  # gibst verschieden auf der Website
+
+    info_font = pygame.font.SysFont('comicsans', 60)
 
     if (blaydmodus):
-        font = pygame.font.SysFont('comicsans', 90)  # gibst verschieden auf der Website
+        font = pygame.font.SysFont('latarcyrheb-sun16', 90)  # gibst verschieden auf der Website
         color = blaydcolor[0]
+        score_label = info_font.render('партитура = ' + str(score),1,color)
         label = font.render('BLAYD MODUS', 1, color)
     elif tigermodus:
         font = pygame.font.SysFont('comicsans', 90)  # gibst verschieden auf der Website
         color = tigercolor[1]
         label = font.render('Ben Erotic', 1, color)
+        score_label = font.render('Score = ' + str(score), 1, color)
 
     else:
-        font = pygame.font.SysFont('comicsans', 60)  # gibst verschieden auf der Website
+        font = pygame.font.SysFont('comicsans', 90)  # gibst verschieden auf der Website
         color = normalcolor
         label = font.render('Marinas TetrisGame', 1, color)
+        score_label = font.render('Score = ' + str(score), 1, color)
 
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), block_size))
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 0))
+    surface.blit(score_label, (top_left_x + play_width / 2 - (label.get_width() / 2), (block_size * 2)))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
@@ -268,6 +300,7 @@ def makeSound(sound):
         effect = mixer.Sound(sound)
         effect.play()
 
+
 def destoryLine(y):
     global grid
     for i in range(len(grid[y])):
@@ -318,7 +351,7 @@ def main(win):
             if not (valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
                 if (current_piece.identy == "normal"):
-                    makeSound(sounds[random.randint(0,len(sounds)-2)])
+                    makeSound(sounds[random.randint(0, len(sounds) - 2)])
                     change_piece = True
                 elif current_piece.identy == "stern":
                     _pos = convert_shape_format(current_piece)
@@ -387,8 +420,8 @@ def main(win):
                     _currentpic = len(_pictures) - 2
                     currentSong = len(_music) - 2
                     changeMusic("play")
-               # if event.key == pygame.K_s
-                    #fall_speed
+            # if event.key == pygame.K_s
+            # fall_speed
 
         shape_pos = convert_shape_format(current_piece)
 
@@ -406,11 +439,11 @@ def main(win):
                 p = (pos[0], pos[1])
                 locked_positions[p] = current_piece.color
             current_piece = next_piece
-            next_piece = get_shape(random.randint(0,8))
-            #next_piece = get_shape(1)
+            next_piece = get_shape(random.randint(0, 8))
             change_piece = False
 
-        draw_window(win, grid)
+        score += clear_rows(grid, locked_positions)
+        draw_window(win, grid,score)
         if check_lost(locked_positions):
             run = False
 
