@@ -3,6 +3,7 @@ import random
 
 # from .drawshapes import returnShapes
 import src.drawshapes as shapedrawer
+import src.record as record_maker
 from pygame import mixer
 
 # creating the data structure for pieces
@@ -211,8 +212,6 @@ def draw_next_shape(shape, surface):
     sy = top_left_y
 
 
-def findAndDestroy(loggedPostion, pos):
-    pass
 
 
 # bladmodus
@@ -420,6 +419,11 @@ def main(win):
                     _currentpic = len(_pictures) - 2
                     currentSong = len(_music) - 2
                     changeMusic("play")
+                # just for testing
+                if event.key == pygame.K_q:
+                    score = 5
+                    run = False
+
             # if event.key == pygame.K_s
             # fall_speed
 
@@ -447,14 +451,21 @@ def main(win):
         if check_lost(locked_positions):
             run = False
 
+    record_maker.read_in_top_five(win,score)
+
     pygame.display.quit()
+    return score
+
 
 
 def main_menu(win):
     main(win)
 
 
+
 win = pygame.display.set_mode((s_width, s_height))
 
 pygame.display.set_caption('Marinas Tetris')
 main_menu(win)  # start game
+
+
