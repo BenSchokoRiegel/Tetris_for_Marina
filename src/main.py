@@ -3,7 +3,7 @@ import random
 
 # from .drawshapes import returnShapes
 import src.drawshapes as shapedrawer
-import src.record as record_maker
+import src.record as rec
 from pygame import mixer
 
 # creating the data structure for pieces
@@ -391,6 +391,9 @@ def main(win):
                     current_piece.rotation += 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.y += 1
+                if event.key == pygame.K_s:
+                    score = 5;
+                    run = False;
                 if event.key == pygame.K_m:
                     currentSong = 0
                     _currentpic = 0
@@ -451,7 +454,9 @@ def main(win):
         if check_lost(locked_positions):
             run = False
 
-    record_maker.read_in_top_five(win,score)
+    rec.read_in_top_five(win, score,[top_left_x,top_left_y,play_width,play_height])
+    while True:
+
 
     pygame.display.quit()
     return score
