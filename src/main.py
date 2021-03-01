@@ -456,10 +456,10 @@ def main(win):
 
     rec.read_in_top_five(win, score,[top_left_x,top_left_y,play_width,play_height])
     while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.display.quit()
 
-
-    pygame.display.quit()
-    return score
 
 
 

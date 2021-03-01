@@ -68,9 +68,13 @@ def draw_top_list(surface,names,score,place, list_of_window_stuff):
                 else:
                     pl_name = pl_name + event.unicode
     pygame.display.update()
+    create_highscore_cheat(names,score)
 
-def create_highscore_cheat():
-    pass
+def create_highscore_cheat(names,records):
+    f = open("Records/level1.txt", "w+")
+    for i in range(0,5):
+        f.write(names[i] + "\t" + str(records[i]) + "\n")
+    f.close()
 
 
 def read_in_top_five(surface, pts,list_of_window_stuff):
@@ -84,6 +88,7 @@ def read_in_top_five(surface, pts,list_of_window_stuff):
         names.append(line[0])
         score.append(int(line[1]))
 
+    f.close()
     for i in range(5):
         if len(score) <= i:
             print("You made it in the Top 5. поздравления!\n")
